@@ -12,10 +12,16 @@ const string reserveword[13] = { "if","while","int","double","main","float","cha
 class scannerToken
 {
 public:
-	void getToken();
-	void getConslToken();
-	void getIdToken();
-	void getStringToken();
+	vector<vector<string>> getToken();
+	vector<string> getConslToken();
+	vector<string> getIdToken();
+	vector<string> getStringToken();
+
+	void setToken(vector<vector<string>> table);
+	void setConslToken(vector<string> consl);
+	void setIdToken(vector<string> id);
+	void setStringToken(vector<string> string);
+
 	scannerToken();
 	~scannerToken();
 private:
@@ -38,24 +44,44 @@ scannerToken::~scannerToken()
 	cout << "token类已被析构" << endl;
 }
 
-void scannerToken::getConslToken()
+vector<string> scannerToken::getConslToken()
+{
+	return conslToken;
+}
+
+vector<string> scannerToken::getIdToken()
 {
 
 }
 
-void scannerToken::getIdToken()
+vector<string> scannerToken::getStringToken()
 {
-
+	return stringToken;
 }
 
-void scannerToken::getStringToken()
+vector<vector<string>> scannerToken::getToken()
 {
-
+	return tableScanner;
 }
 
-void scannerToken::getToken()
+void scannerToken::setToken(vector<vector<string>> table)
 {
+	tableScanner = table;
+}
 
+void scannerToken::setConslToken(vector<string> consl)
+{
+	conslToken = consl;
+}
+
+void scannerToken::setIdToken(vector<string> id)
+{
+	idToken = id;
+}
+
+void scannerToken::setStringToken(vector<string> string)
+{
+	stringToken = string;
 }
 
 void concat();
@@ -71,3 +97,5 @@ int reserve(string s);
 void retract(FILE *fp);
 
 void getChar(FILE *fp);
+
+void scanner();
