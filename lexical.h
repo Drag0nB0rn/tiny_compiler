@@ -38,68 +38,36 @@ scannerToken::~scannerToken()
 	cout << "token类已被析构" << endl;
 }
 
-void concat()
+void scannerToken::getConslToken()
 {
-	strToken += CH;
+
 }
 
-bool isNum(char c)
+void scannerToken::getIdToken()
 {
-	if ((c >= '0') && (c <= '9'))
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+
 }
 
-bool isAlpha(char c)
+void scannerToken::getStringToken()
 {
-	if ((c >= 'a') && (c <= 'z') || (c >= 'A') && (c <= 'Z'))
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+
 }
 
-bool underline(char  c)
+void scannerToken::getToken()
 {
-	if (c == '_')
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+
 }
 
-int reserve(string s)
-{
-	int m, flag = 13;
-	for (int i = 0; i < 13; i++)
-	{
-		m = s.compare(reserveword[i]);
-		if (m == 0)
-		{
-			flag = i;
-		}
-	}
-	return flag;
-}
+void concat();
 
-void retract(FILE *fp)
-{
-	CH = ' ';
-	fseek(fp, -1, SEEK_CUR);
-}
+bool isNum(char c);
 
-void getChar(FILE *fp)
-{
-	CH = getc(fp);
-}
+bool isAlpha(char c);
+
+bool underline(char  c);
+
+int reserve(string s);
+
+void retract(FILE *fp);
+
+void getChar(FILE *fp);
