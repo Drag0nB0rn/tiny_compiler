@@ -1,4 +1,3 @@
 #include "table.h"
-#include <cstring>
-#include <iostream>
-#include <vector>
+#include "preProcess.h"
+#include "lexical.h"
