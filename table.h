@@ -120,27 +120,28 @@ public:
 
 	table();
 
-	int getAddr(const int pos);//获得标识符地址
+	string getFunName(int pos);
 
-	synblCat getCat(const int pos);//获得标识符种类  是函数？ 常量？ 变量？
+	int getAddr(int pos);//获得标识符地址
 
-	synblTval getTval(const int pos);//获得标识符类型   int，float，char，。。。
+	synblCat getCat(int pos);//获得标识符种类  是函数？ 常量？ 变量？
+
+	synblTval getTval(int pos);//获得标识符类型   int，float，char，。。。
 
 	int size(); //返回synblTable符号总表的大小，即标识符个数
 
-	bool isactive(const int pos);//返回当前标识符活跃标志
+	bool isactive(int pos);//返回当前标识符活跃标志
 
-	int getValue(const int pos);//返回pos标识符的值，仅当pos为变量是有效，若为其他值，返回0
+	int getValue(int pos);//返回pos标识符的值，仅当pos为变量是有效，若为其他值，返回0
 
-	bool istmp(const int pos);
+	bool isTmp(int pos);
 
-	~table();
+	//~table();
 	
 	void clear();//初始化各表
 
 	
 private:
-
 
 	vector<synbl> synblTable;	//符号表总表
 	vector<tapel> tapelTable;	//类型表
@@ -154,7 +155,6 @@ private:
 };
 
 
-table idTable;	//标识符表，即符号表
 
 
 /*
@@ -181,7 +181,6 @@ struct fourelement
 };
 
 
-vector<fourelement> four;			//四元式序列
 
 /*
 //前段

@@ -1,5 +1,9 @@
 #include "table.h"
 
+table idTable;	//标识符表，即符号表
+
+vector<fourelement> four;			//四元式序列
+
 void table::clear()//各表初始化
 {
 	synblTable.clear();
@@ -20,18 +24,23 @@ table::table()
 
 }
 
-int table::getAddr(const int pos)
+string table::getFunName(int pos)
+{
+	return synblTable[pos].name;
+}
+
+int table::getAddr(int pos)
 {
 	return synblTable[pos].addr;
 }
 
-synblCat table::getCat(const int pos)
+synblCat table::getCat(int pos)
 {
 
 	return synblTable[pos].cat;
 }
 
-synblTval table::getTval(const int pos)
+synblTval table::getTval(int pos)
 {
 	return synblTable[pos].type;
 }
@@ -41,12 +50,12 @@ int table::size()
 	return synblTable.size();
 }
 
-bool table::isactive(const int pos)
+bool table::isactive(int pos)
 {
 	return synblTable[pos].active;
 }
 
-int table::getValue(const int pos)
+int table::getValue(int pos)
 {
 	if (synblTable[pos].type == tvalInt) {//应返回值，暂时返回地址，后期修改
 		return synblTable[pos].addr;
@@ -54,7 +63,7 @@ int table::getValue(const int pos)
 	return 0;
 }
 
-bool table::istmp(const int pos)
+bool table::isTmp(int pos)
 {
 	return false;
 }
