@@ -7,31 +7,99 @@ using namespace std;
 char CH;
 string strToken = "";
 
+const string reserveword[13] = { "if","while","int","double","main","float","char","do","else","return","cout","cin","printf" };
+
 class scannerToken
 {
 public:
 	void getToken();
+	void getConslToken();
+	void getIdToken();
+	void getStringToken();
 	scannerToken();
 	~scannerToken();
 private:
 	vector<vector<string>> tableScanner;
+	vector<string> conslToken;
+	vector<string> idToken;
+	vector<string> stringToken;
 };
 
-scannerToken::scannerToken();
+scannerToken::scannerToken()
+{
+	for (int i = 0; i < 25; i++)
+	{
+		tableScanner[i].resize(2);
+	}
+}
 
+scannerToken::~scannerToken()
+{
+	cout << "token类已被析构" << endl;
+}
 
-scannerToken::~scannerToken();
+void concat()
+{
+	strToken += CH;
+}
 
+bool isNum(char c)
+{
+	if ((c >= '0') && (c <= '9'))
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
 
-void concat();
+bool isAlpha(char c)
+{
+	if ((c >= 'a') && (c <= 'z') || (c >= 'A') && (c <= 'Z'))
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
 
-bool isNum(char c);
+bool underline(char  c)
+{
+	if (c == '_')
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
 
+int reserve(string s)
+{
+	int m, flag = 13;
+	for (int i = 0; i < 13; i++)
+	{
+		m = s.compare(reserveword[i]);
+		if (m == 0)
+		{
+			flag = i;
+		}
+	}
+	return flag;
+}
 
-bool isAlpha(char c);
+void retract(FILE *fp)
+{
+	CH = ' ';
+	fseek(fp, -1, SEEK_CUR);
+}
 
-bool underline(char  c);
-
-int reserve(string s);
-
-void retract(FILE *fp);
+void getChar(FILE *fp)
+{
+	CH = getc(fp);
+}
