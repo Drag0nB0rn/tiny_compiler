@@ -98,9 +98,8 @@ bool parserTable::isNotTer(string c)
 		{
 			return true;
 		}
-		else
-			return false;
 	}
+	return false;
 }
 
 bool parserTable::isTer(string c)
@@ -185,34 +184,39 @@ bool parserTable::LL1Parser()  //未完
 		}
 		else if (!isTer(top))
 		{ 
-			cout<<"check(" << top << "," << cur << ")\t";
-			check t;
-			t=checkList(cur, top);
-			if (t.flag)
+			if (isNotTer(top))
 			{
- 				production tmp;
-				tmp = pro[t.proIndex];
-				string stmp="";
-				for (int i = 0; i <=tmp.right.length()-1; i++)  //产生式右部(已逆序)压栈
+				cout << "check(" << top << "," << cur << ")\t";
+				check t;
+				t = checkList(cur, top);
+				if (t.flag)
 				{
-					if (tmp.right[i] != '&')
+					production tmp;
+					tmp = pro[t.proIndex];
+					string stmp = "";
+					for (int i = 0; i <= tmp.right.length() - 1; i++)  //产生式右部(已逆序)压栈
 					{
-						stmp += tmp.right[i];
+						if (tmp.right[i] != '&')
+						{
+							stmp += tmp.right[i];
+						}
+						else
+						{
+							synStack.push(stmp);
+							stmp = "";
+						}
 					}
-					else
-					{
-						synStack.push(stmp);
-						stmp = "";
-					}
+					synStack.push(stmp);
+					continue;
 				}
-				synStack.push(stmp);
+				else
+				{
+					flag = false;
+					cout << "error2";
+					break;
+				}
 			}
-			else
-			{
-				flag = false;
-				error();
-			}
-			if (!isNotTer(top))
+			else if (!isNotTer(top))
 			{
 				if (cur == "#")
 				{
@@ -222,7 +226,8 @@ bool parserTable::LL1Parser()  //未完
 				else
 				{
 					flag = false;
-					error();
+					cout << "error3";
+					break;
 				}
 			}
 		}
@@ -246,6 +251,3 @@ int main()
 	return 0;*/
 	cout <<"\nres:"<< table.LL1Parser();
 }
-
-
-
