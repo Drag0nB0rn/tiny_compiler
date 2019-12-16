@@ -5,7 +5,7 @@
 #include<string>
 #include<vector>
 #include<iostream>
-typedef struct production         //²úÉúÊ½
+typedef struct production         //äº§ç”Ÿå¼
 {
 	string left;
 	string right;
@@ -14,28 +14,43 @@ typedef struct check
 {
 	bool flag;
 	//map<char, string> production;
-	int proIndex; //²úÉúÊ½ĞòºÅ
+	int proIndex; //äº§ç”Ÿå¼åºå·
 };
 
 class parserTable
 {
 public:
 
-	void getToken();		//»ñÈ¡token
-	production getProduction(int index);   //»ñÈ¡²úÉúÊ½
-	void creatProduction(); //Ğ´Èë²úÉúÊ½
-	void travelProduction(); //±éÀú
-	void creatParserList();	//½¨Á¢·ÖÎö±í
+	void getToken();		//è·å–token
+	synbl getNext();		
+	production getProduction(int index);   //è·å–äº§ç”Ÿå¼
+	void creatProduction(); //å†™å…¥äº§ç”Ÿå¼
+	void travelProduction(); //éå†
+	void ins(string left,string right);
+	void creatParserList();	//å»ºç«‹åˆ†æè¡¨
+	void creatTerTable();
+	void creatNotTerTable();
+	void printSynStack();
 	bool isTer(string c);
-	bool isNotTer(char c);
-	check checkList(string cur,string top);	//²é±í·µ»Øtrue or falseÓë²úÉúÊ½ĞòºÅ
+	bool isNotTer(string c);
+	bool isConstan(string cur);		//å½“å‰ç¬¦æ˜¯å¦åœ¨å¸¸æ•°è¡¨ä¸­
+	bool isString(string cur);		//åŒä¸Š
+	bool isIdtifier(string cur);	//åŒä¸Š
+	bool isKeyword(string cur);		//åŒä¸Š
+	bool LL1Parser();
+	bool match(string cur,string top);   //egï¼šcur="1"ï¼Œtop="i"; iä»£è¡¨å¸¸æ•°ï¼Œmatch("1","i")==true;
+	string getNextCur();
+	check checkList(string cur,string top);	//æŸ¥è¡¨è¿”å›true or falseä¸äº§ç”Ÿå¼åºå·
 	stack<string> getSynStack();
 	stack<string> getSemStack();
 private:
-	vector<string> terTable;
-	vector<char> notTerTable;
-	vector<production> pro; //²úÉúÊ½
-	stack<string> synStack;	//·ÖÎöÕ»
-	stack<string> semStack;	//ÓïÒåÕ»
-	map<int,string>parserList; //·ÖÎö±í(²úÉúÊ½ĞòºÅ£¬µ±Ç°·û)
+	vector<string> terTable;	//ç»ˆç»“ç¬¦è¡¨
+	vector<string> notTerTable;	//éç»ˆç»“ç¬¦è¡¨
+	vector<production> pro; //äº§ç”Ÿå¼
+	stack<string> synStack;	//åˆ†ææ ˆ
+	stack<string> semStack;	//è¯­ä¹‰æ ˆ
+	map<int,string>parserList; //åˆ†æè¡¨(äº§ç”Ÿå¼åºå·ï¼Œå½“å‰ç¬¦)
+	string cur;	//å½“å‰ç¬¦
+	string token[6] = { "int","a","#" };
+	int p_token = 0;
 };
