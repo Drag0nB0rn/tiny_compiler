@@ -1,5 +1,7 @@
 #include "parser.h"
+#include "lexical.h"
 using namespace std;
+scannerToken tmp;
 void error()
 {
 	return;
@@ -15,13 +17,17 @@ check parserTable::checkList(string cur, string top)		//未完
 	{
 		vector<string> t2 = it->second;
 		production tmp = pro[it->first];
-		int q = it->first;
 		//cout << tmp.left << "->" << tmp.right << " " <<endl;
 		for (auto u : t2)     //一键多值，遍历产生式对应的终结符vector
 		{
 			if (u == cur)	//产生式可推出该终结符
 			{
 				flag2 = true;   
+				break;
+			}
+			else if (match(u, cur))
+			{
+				flag2 = true;
 				break;
 			}
 		}
@@ -52,7 +58,7 @@ void parserTable::creatTerTable() //test
 	terTable.push_back("int");
 	terTable.push_back("char");
 	terTable.push_back("float");
-	terTable.push_back("a");
+	terTable.push_back("id");
 }
 void parserTable::creatNotTerTable() //test
 {
@@ -68,7 +74,7 @@ void parserTable::creatProduction()  //test
 	ins("type", "int");
 	ins("type", "char");
 	ins("type","float");
-	ins("F", "a");
+	ins("F", "id");
 }
 void parserTable::printSynStack()
 {
@@ -129,12 +135,68 @@ bool parserTable::isNotTer(string c)
 	}
 	return false;
 }
-
-bool parserTable::isTer(string c)
+bool parserTable::isConstant(string cur)
 {
-	for (auto u : terTable)
+	vector<constant> t;
+	t = tmp.getConslToken();
+	for (auto u : t)	//遍历
 	{
-		if (u == c)
+		if (cur == u.name)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+bool parserTable::isString(string cur)
+{
+	vector<symbolString> t;
+	scannerToken tmp;
+	t = tmp.getStringToken();
+	for (auto u : t)	//遍历
+	{
+		if (cur == u.name)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+bool parserTable::isIdtifier(string cur)
+{
+	vector<identy> t;
+	t = tmp.getIdToken();
+	for (auto u : t)   //遍历
+	{
+		if (cur == u.name)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+bool parserTable::isKeyword(string cur)
+{
+	for (auto u : reserveword)	//遍历
+	{
+		if (cur == u)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+bool parserTable::isDelimiter(string cur)
+{
+	vector<del> t;
+	t = tmp.getDelimiterToken();
+	for (auto u : t)
+	{
+		if (cur == u.name)
 		{
 			return true;
 		}
@@ -147,19 +209,89 @@ bool parserTable::match(string cur, string top)
 	{
 		return true;
 	}
-
+	else if (top == "cons"&&isConstant(cur))
+	{
+		return true;
+	}
+	else if (top == "str"&&isString(cur))
+	{
+		return true;
+	}
+	else if (top == "id"&&isIdtifier(cur))
+	{
+		return true;
+	}
+	else if (top == "key"&&isKeyword(cur))
+	{
+		return true;
+	}
+	else if (top == "del"&&isDelimiter(cur))
+	{
+		return true;
+	}
 
 }
+
+bool parserTable::isTer(string c)
+{
+	for (auto u : terTable)
+	{
+		if (u == c)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 string parserTable::getNextCur()  //test
 {
 	string t;
-	t = token[p_token];
+	t = token1[p_token];
 	p_token++;
 	return t;
 
 }
+string parserTable::getNext(vector<token> Token)		//未完
+{
+	string t;
+	if (Token[p].type == "constant")   //查对应表再返回单词
+	{
+		t = Token[p].name;
+		p++;
+		return t;
+
+	}
+	else if (Token[p].type == "symbolString")
+	{
+		t = Token[p].name;
+		p++;
+		return t;
+	}
+	else if (Token[p].type == "identy")
+	{ 
+		t = Token[p].name;
+		p++;
+		return t;
+	}
+	else if (Token[p].type == "key")
+	{
+		t = Token[p].name;
+		p++;
+		return t;
+	}
+	else if (Token[p].type == "del")
+	{
+		t = Token[p].name;
+		p++;
+		return t;
+	}
+
+}
 bool parserTable::LL1Parser()  //未完
 {
+	vector<token> Token;
+	Token = tmp.getToken();
 	bool flag = false;
 	int num = 0;
 	creatNotTerTable();
@@ -167,7 +299,7 @@ bool parserTable::LL1Parser()  //未完
 	synStack.push("#");
 	synStack.push("E");
 	string cur, top;
-	cur = getNextCur();
+	cur = getNext(Token);
 	while (!synStack.empty())
 	{
 		cout << num << " ";
@@ -185,9 +317,8 @@ bool parserTable::LL1Parser()  //未完
 			}*/
 			if (top == cur || match(cur, top))
 			{
-				cur = getNextCur();
 				cout << "macth!\n";
-				continue;
+				cur = getNext(Token);
 			}
 			else
 			{
@@ -264,6 +395,10 @@ bool parserTable::LL1Parser()  //未完
 }
 int main()
 {
+	tmp.insId("a", "identy", 0);
+	tmp.insToken("float", "key", 0);
+	tmp.insToken("a", "identy", 0);
+	tmp.insToken("#", "identy", 0); //token(float a #)
 	parserTable table;
 	table.creatParserList();
 	table.travelProduction();
