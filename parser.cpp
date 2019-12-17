@@ -1,4 +1,3 @@
-#include "table.h"
 #include "parser.h"
 using namespace std;
 void error()
@@ -6,15 +5,27 @@ void error()
 	return;
 }
 
-check parserTable::checkList(string cur,string top)		//未完
+check parserTable::checkList(string cur, string top)		//未完
 {
 	check t;
-	map<int, string>::iterator it;
+	bool flag2=false;
+	map<int, vector<string>>::iterator it;
+	int i = 1;
 	for (it = parserList.begin(); it != parserList.end(); it++)  //用迭代器遍历查分析表
 	{
+		vector<string> t2 = it->second;
 		production tmp = pro[it->first];
-		//cout << tmp.left << "->" << tmp.right << " " << it->second<<endl;
-		if (it->second == cur && tmp.left == top)   //L(cur,top)= ?
+		int q = it->first;
+		//cout << tmp.left << "->" << tmp.right << " " <<endl;
+		for (auto u : t2)     //一键多值，遍历产生式对应的终结符vector
+		{
+			if (u == cur)	//产生式可推出该终结符
+			{
+				flag2 = true;   
+				break;
+			}
+		}
+		if (flag2 && tmp.left == top)   //L(cur,top)= ?
 		{
 			t.flag = true;
 			t.proIndex = it->first;
@@ -25,6 +36,7 @@ check parserTable::checkList(string cur,string top)		//未完
 			t.flag = false;
 			t.proIndex = -1;
 		}
+		flag2 = false;
 	}
 	return t;
 }
@@ -38,6 +50,8 @@ void parserTable::ins(string left, string right)
 void parserTable::creatTerTable() //test
 {
 	terTable.push_back("int");
+	terTable.push_back("char");
+	terTable.push_back("float");
 	terTable.push_back("a");
 }
 void parserTable::creatNotTerTable() //test
@@ -49,8 +63,11 @@ void parserTable::creatNotTerTable() //test
 
 void parserTable::creatProduction()  //test
 {
+	//ins("$", "$");
 	ins("E", "F&type");
 	ins("type", "int");
+	ins("type", "char");
+	ins("type","float");
 	ins("F", "a");
 }
 void parserTable::printSynStack()
@@ -71,13 +88,24 @@ void parserTable::travelProduction()  //test
 		cout << u.left << "->" << u.right << endl;
 	}
 }
-
+void parserTable::insL(int key, string value )
+{
+	t5.push_back(value);
+	parserList[key] = t5;
+}
 void parserTable::creatParserList()  //test
 {
 	creatProduction();
-	parserList[0] = "int";
-	parserList[1] = "int";
-	parserList[2] = "a";
+	insL(0, "int");
+	insL(0, "float");
+	insL(0, "char");
+	t5.clear();
+	insL(1, "int");
+	insL(2, "float");
+	insL(3, "char");
+	t5.clear();
+	insL(4, "a");
+	t5.clear();
 }
 
 void parserTable::getToken()
@@ -119,7 +147,7 @@ bool parserTable::match(string cur, string top)
 	{
 		return true;
 	}
-	
+
 
 }
 string parserTable::getNextCur()  //test
@@ -132,7 +160,7 @@ string parserTable::getNextCur()  //test
 }
 bool parserTable::LL1Parser()  //未完
 {
-	bool flag=false;
+	bool flag = false;
 	int num = 0;
 	creatNotTerTable();
 	creatTerTable();
@@ -155,7 +183,7 @@ bool parserTable::LL1Parser()  //未完
 				flag = true;
 				break;
 			}*/
-			if (top == cur||match(cur,top))
+			if (top == cur || match(cur, top))
 			{
 				cur = getNextCur();
 				cout << "macth!\n";
@@ -183,7 +211,7 @@ bool parserTable::LL1Parser()  //未完
 			}
 		}
 		else if (!isTer(top))
-		{ 
+		{
 			if (isNotTer(top))
 			{
 				cout << "check(" << top << "," << cur << ")\t";
@@ -239,7 +267,7 @@ int main()
 	parserTable table;
 	table.creatParserList();
 	table.travelProduction();
-	/*check t = table.checkList("i","E");
+	/*check t = table.checkList("int","E");
 	if (t.flag)
 	{
 		cout << "true" << endl;
@@ -249,5 +277,5 @@ int main()
 	else
 		cout << "false" << endl;
 	return 0;*/
-	cout <<"\nres:"<< table.LL1Parser();
+	cout << "\nres:" << table.LL1Parser();
 }
