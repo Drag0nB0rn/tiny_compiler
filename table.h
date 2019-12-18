@@ -3,7 +3,7 @@
 #include<string>
 #include<vector>
 #include<map>
-
+#include<stack>
 using namespace std;
 
 /*
@@ -57,10 +57,13 @@ struct synbl{  //符号表
 
 	string name; //名字
 	synblTval type;//类型
-	int typePosition;	//类型坐标   
+	int typePosition;	//类型坐标，好像没啥用？
 	synblCat cat;//种类
+	int catPos;//种类坐标 
 	int addr;		//地址
+	int length;		//该标识符所占存储单元
 	bool active;	//活跃与否
+	stack<bool> activeStack;//四元式中的标识符活跃信息
 };
 
 struct tapel //类型表
@@ -103,7 +106,7 @@ struct consl	//常数
 	string value;	//常数值
 };
 
-struct lenl     //长度
+struct lenl     //长度表 
 {
 	int length;
 };
@@ -134,8 +137,15 @@ public:
 
 	int getValue(int pos);//返回pos标识符的值，仅当pos为变量是有效，若为其他值，返回0
 
-	bool isTmp(int pos);
+	bool isTmp(int pos);//是否为临时变量
 
+	bool isConst(int pos);//是否为常量
+
+	int getConst(int pos);//返回常量的值
+
+	void setActive(int pos,bool active);//将标识符active设为true
+
+	int insertConst(int curConst);//插入常数
 	//~table();
 	
 	void clear();//初始化各表
@@ -178,6 +188,7 @@ struct fourelement
 {
 	string fix;//运算符 +-*/ > < = if，else fun call endcall
 	int pos1=-1, pos2=-1, pos3=-1;//三个目标操作数的地址,全部初始化为-1，-1代表空
+	bool active1, active2, active3;//三个操作数的活跃信息
 };
 
 

@@ -67,3 +67,33 @@ bool table::isTmp(int pos)
 {
 	return false;
 }
+
+bool table::isConst(int pos)
+{
+	if (synblTable[pos].cat == catConst)
+		return true;
+	return false;
+}
+
+int table::getConst(int pos)
+{
+
+	int res = atoi(conslTable[synblTable[pos].catPos].value.c_str());
+	return res;
+}
+
+void table::setActive(int pos,bool active)
+{
+	synblTable[pos].active = active;
+}
+
+
+
+int table::insertConst(int curConst)
+{
+	synbl tmp;
+	tmp.cat = catConst;
+	tmp.catPos = synblTable.size();
+
+	return 0;
+}
