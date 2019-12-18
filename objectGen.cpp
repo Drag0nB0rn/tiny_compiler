@@ -1,5 +1,5 @@
 #include"tableExtern.h"
-
+#include<stack>
 
 using namespace std;
 
@@ -16,9 +16,13 @@ string obj;				//目标代码
 
 string ifProcess;//if过程名
 int ifProNum;//if过程标号
+stack<string> iEndfStack;
+stack<string> elseStack;
 
 string whiProcess;//while过程名
 int whiProNum;//while过程标号
+stack<string> whileEndStack;
+stack<string> doStack;
 
 string cmpProcess;//比较产生的过程
 int cmpProNum;//比较过程标号
@@ -99,7 +103,7 @@ void ope_1(string ope,int pos)//+  -  *  /
 
 }
 
-void opecmp(string ope, int pos)
+void opeCmp(string ope, int pos)
 {
 	int pos1, pos2, pos3;
 	pos1 = idTable.getAddr( four[pos].pos1), pos2 = idTable.getAddr(four[pos].pos2), pos3 = idTable.getAddr(four[pos].pos3);
@@ -128,7 +132,7 @@ void opecmp(string ope, int pos)
 
 }
 
-void objgen()
+void objGen()
 {
 
 
@@ -176,10 +180,10 @@ void objgen()
 			}
 		}
 		else if (curfour.fix == ">") {//cmp pos1,pos2;   
-			opecmp("JB",pos);
+			opeCmp("JB",pos);
 		}
 		else if (curfour.fix == "<") {
-			opecmp("JA", pos);
+			opeCmp("JA", pos);
 		}
 		else if (curfour.fix == "if") { //( if , t,  ,_pos )如果t为假，则跳到_pos,否则顺序执行
 
@@ -204,27 +208,29 @@ void objgen()
 			obj += ifProcess;
 			obj += to_string(ifProNum);
 			obj += "\n";
-		}
-		else if (curfour.fix == "ifEnd") {
-
+			string tmp = ifProcess;
+			tmp += to_string(ifProNum);
+			elseStack.push(tmp);//process1压栈
+			tmp.clear();
+			tmp = ifProcess;
+			tmp += to_string(ifProNum + 1);
+			elseStack.push(tmp);//process2压栈
+			iEndfStack.push(tmp);//process2压栈；
+			ifProNum += 2;
 		}
 		else if (curfour.fix == "else") {
 			//JMP ifProcess2
 			obj += "JMP ";//若执行ifProcess0，则需结束过程后跳转至pocess2，也就是ifelse结束
-			obj += ifProcess;
-			obj += to_string(ifProNum + 1);
+			obj += elseStack.top(), elseStack.pop();
+			obj += "\n";
 
 			//ifProcess1:
-			obj += ifProcess;//else过程
-			obj += to_string(ifProNum);
+			obj += elseStack.top(), elseStack.pop();
 			obj += ":\n";
-			ifProNum++;
 		}
-		else if (curfour.fix == "elseEnd") {//结束else之后，跳出ifelse的程序段标识
+		else if (curfour.fix == "ifEnd") {//结束else之后，跳出ifelse的程序段标识
 			//ifProcess2:
-			obj += ifProcess;//添加过程2标头
-			obj += to_string(ifProNum);
-			ifProNum++;
+			obj += iEndfStack.top(), iEndfStack.pop();//ifProcess2:
 			obj += ":\n";
 		}
 		else if (curfour.fix == "while") {//while开始
@@ -239,34 +245,43 @@ void objgen()
 			pro2:
 			*/
 			obj += whiProcess;
-			obj += to_string(whiProNum), whiProNum++;
+			obj += to_string(whiProNum);
 			obj += ":\n";
+			string tmp = whiProcess;
+			tmp += to_string(whiProNum+1);
+			whileEndStack.push(tmp);//process2压栈
+			doStack.push(tmp);//process2压栈
+			tmp.clear();
+			tmp = whiProcess;
+			tmp += to_string(whiProNum);
+			whileEndStack.push(tmp);//process1压栈
+			whiProNum += 2;
 		}
 		else if (curfour.fix == "do") {//判断条件  (do, t,,)
 			obj += "CMP [";
 			obj += idTable.getAddr(curfour.pos1);
 			obj += "],1\n";
 			obj += "JNZ ";
-			obj += whiProcess;
-			obj += to_string(whiProNum);
+			obj += doStack.top(), doStack.pop();
 		}
-		else if (curfour.fix == "endWhile") {//while结束标志，根据判定条件决定是否要结束
+		else if (curfour.fix == "whileEnd") {//while结束标志，根据判定条件决定是否要结束
 			obj += "JMP ";
-			obj += whiProcess;
-			obj += to_string(whiProNum - 1);
+			obj += whileEndStack.top(), whileEndStack.pop();
 			obj += "\n";
-			obj += whiProcess;
-			obj += to_string(whiProNum);
+			obj += whileEndStack.top(), whileEndStack.pop();
 			obj += ":\n";
 		}
-		else if (curfour.fix == "call") {
+		else if (curfour.fix == "call") {//调用函数
 
 		}
-		else if (curfour.fix == "funStart") {//函数开始
+		else if (curfour.fix == "return") {//函数返回
+
+		}
+		else if (curfour.fix == "funStart") {//函数定义开始
 			obj+=idTable.getFunName(curfour.pos1);
 			obj += " PROC NEAR\n";
 		}
-		else if (curfour.fix == "funEnd") {//函数结束
+		else if (curfour.fix == "funEnd") {//函数定义结束
 			obj += "RET\n";
 			obj += idTable.getFunName(curfour.pos1);
 			obj += " ENDP\n";
